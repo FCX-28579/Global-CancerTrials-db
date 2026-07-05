@@ -1,0 +1,395 @@
+# Deterministic rules applied before LLM review.
+#
+# Design boundary:
+# - Rule keep: only for clearly cancer-related support/prevention/survivorship contexts.
+# - Rule reject: only when the recall field is weak and the text pattern has a
+#   known non-oncology meaning, background-only meaning, or administrative use.
+# - Remaining ambiguous records stay pending for LLM/manual review.
+
+intervention_false_positive_patterns:
+  biology_mechanism:
+    - anti-tumor necrosis factor
+    - anti tumour necrosis factor
+    - tumor necrosis factor
+    - tumour necrosis factor
+    - tnf-alpha
+    - tnf alpha
+    - tumor necrosis factor-alpha
+    - tumour necrosis factor-alpha
+  reproductive_or_developmental_terms:
+    - leukemia inhibitory factor
+    - leukaemia inhibitory factor
+  non_oncology_device_or_formulation:
+    - paclitaxel-eluting
+    - paclitaxel eluting
+    - taxus stent
+    - sirolimus-eluting
+    - sirolimus eluting
+  drug_label_or_prior_oncology_use:
+    - approved for treating some cancers
+    - approved for the treatment of some cancers
+    - used to treat some types of cancer
+    - fda-approved to treat nausea and vomiting caused by cancer therapy
+    - fda approved to treat nausea and vomiting caused by cancer therapy
+    - indicated for the treatment of unresectable hepatocellular carcinoma
+    - advanced renal cell carcinoma
+    - used in clinical trials for multiple myeloma
+    - used in clinical trials for multiple myeloma, non-hodgkin's lymphoma and leukemia
+    - used in the treatment of b cell non-hodgkin
+  administrative_or_education_material:
+    - national cancer institute pamphlet
+    - national cancer institute's clearing the air
+    - canadian cancer society
+    - cancer prevention and screening
+    - educational message on skin cancer awareness
+    - breast cancer screening
+
+abbreviation_false_positive_patterns:
+  crc:
+    - crc-pharma
+    - crc pharma
+    - crc-749
+    - crc749
+    - clinical research center
+    - colorectal surgery
+    - colorectal and genitourinary tract tests
+    - crc to allow for frequent blood sampling
+  hcc:
+    - hepatitis care coordination
+    - hcc intervention
+    - hcc program
+    - home-based continuing care
+  aml:
+    - amlodipine
+    - olmesartan/amlodipine
+    - olmesartan amlodipine
+    - azilsartan medoxomil
+  cml:
+    - columbus metropolitan library
+    - central medical library
+
+non_oncology_context_patterns:
+  inflammatory_or_autoimmune:
+    - rheumatoid arthritis
+    - crohn
+    - ulcerative colitis
+    - inflammatory bowel disease
+    - ankylosing spondylitis
+    - psoriasis
+    - psoriatic arthritis
+    - systemic lupus
+    - lupus erythematosus
+  cardiometabolic_or_vascular:
+    - chronic obstructive pulmonary disease
+    - copd
+    - coronary artery disease
+    - coronary stent
+    - restenosis
+    - diabetes
+    - hypertension
+    - heart failure
+    - arrhythmia
+  reproductive_or_infectious:
+    - infertility
+    - implantation failure
+    - in vitro fertilization
+    - hepatitis
+    - hiv
+    - sexually transmitted
+  neurologic_or_behavioral:
+    - spinal cord injury
+    - traumatic brain injury
+    - bipolar disorder
+    - substance use
+    - smoking cessation
+
+rule_keep_positive_context_patterns:
+  cancer_population:
+    - cancer survivor
+    - cancer survivors
+    - childhood cancer survivor
+    - pediatric oncology patients
+    - patients with cancer
+    - diagnosis of cancer
+  treatment_toxicity_or_supportive_care:
+    - chemotherapy-induced
+    - chemotherapy induced
+    - radiation-induced
+    - radiation induced
+    - chemoradiation
+    - anthracycline cardiotoxicity
+    - cancer related pain
+    - cancer-related pain
+    - chemotherapy and radiation preceding a bone marrow transplant
+    - palliative care in cancer
+    - oncology palliative
+    - oral mucositis
+    - alimentary mucositis
+    - post-radiation salvage surgery
+    - post radiation salvage surgery
+  malignant_obstruction_or_surgery:
+    - malignant obstruction
+    - malignant colonic obstruction
+    - malignant biliary strictures
+    - post radiation salvage surgery
+    - stage ii - iii breast cancer
+    - elective colon cancer surgery
+    - suspected skin cancer
+    - skin cancer surgery
+    - colorectal cancer lesions
+    - colorectal cancer lesion
+    - renal cancer diagnosis
+  prevention_screening_or_risk:
+    - cervical cancer prevention
+    - breast cancer screening
+    - breast cancer prevention
+    - hereditary breast/ovarian cancer syndrome
+    - brca1/2
+    - brca 1 or brca 2
+  hematology_transplant:
+    - hematologic malignancies
+    - hematological malignancy
+    - haematological malignancy
+    - bone marrow transplant patients
+    - ebv-associated malignancies
+
+text_false_positive_patterns:
+  biology_mechanism:
+    - tumor necrosis factor
+    - tumour necrosis factor
+    - tnf-alpha
+    - tnf alpha
+    - tumor necrosis factor-alpha
+    - tumour necrosis factor-alpha
+
+administrative_or_instrument_patterns:
+  institutions_or_standards:
+    - national cancer institute
+    - canadian cancer society
+    - cancer hospital
+    - common toxicity criteria
+    - common terminology criteria for adverse events
+    - ctc of the national cancer institute
+  questionnaires_or_scales:
+    - functional assessment of cancer therapy
+    - european organization for research and treatment of cancer quality of life
+    - european organisation for research and treatment of cancer quality of life
+    - cancer therapy-general
+    - fact-g
+    - fact-c
+    - eortc qlq
+  generic_health_education:
+    - cancer prevention pamphlet
+    - clearing the air
+    - skin cancer awareness
+    - oral cancer leaflet
+
+risk_only_patterns:
+  generic_risk:
+    - increased risk of cancer
+    - risk of cancer
+    - develop cancer
+    - cancer incidence
+    - incidence of cancer
+    - cancer mortality
+    - mortality from cancer
+  lifestyle_or_public_health_background:
+    - smoking causes lung cancer
+    - smoking causes lung cancer, heart disease
+    - cancer and coronary heart disease
+    - chronic diseases -- cardiovascular diseases, diabetes, and cancers
+  disease_complication_background:
+    - develop liver cancer
+    - causative factor of hepatocellular carcinoma
+    - risk factor for hepatocellular carcinoma
+    - associated with hepatocellular carcinoma
+
+eligibility_exclusion_patterns:
+  explicit_exclusion:
+    - "exclusion criteria: * cancer"
+    - "exclusion criteria: cancer"
+    - "exclusion criteria: * history of cancer"
+    - "exclusion criteria: history of cancer"
+    - active cancer
+    - active malignancy
+    - current cancer
+    - current malignancy
+    - previous cancer
+    - prior cancer
+    - history of cancer
+    - history of malignancy
+    - previous malignancy
+    - prior malignancy
+    - known malignancy
+  exception_language:
+    - cancer except non-metastatic
+    - cancer except non melanoma skin cancer
+    - history of malignancy except
+    - malignancy except basal cell
+    - malignancy other than kaposi
+    - concurrent neoplasms other than
+    - patients with malignancy other than
+    - except adequately treated basal cell
+    - except basal cell carcinoma
+    - except squamous cell carcinoma of the skin
+    - except cervical carcinoma in situ
+  comorbidity_lists:
+    - no history of stroke, myocardial infarction, cancer
+    - excluded. patients with malignancy
+
+low_text_rule_keep_patterns:
+  cancer_population:
+    - cancer survivor
+    - cancer survivors
+    - childhood cancer survivor
+    - pediatric oncology patients
+    - neuropathic pain with diagnosis of cancer
+  treatment_toxicity_or_supportive_care:
+    - chemotherapy-induced
+    - chemotherapy induced
+    - radiation-induced
+    - radiation induced
+    - chemoradiation
+    - anthracycline cardiotoxicity
+    - cancer related pain
+    - cancer-related pain
+    - chemotherapy and radiation preceding a bone marrow transplant
+    - palliative care in cancer
+    - oral mucositis
+    - alimentary mucositis
+    - post-radiation salvage surgery
+    - post radiation salvage surgery
+  prevention_screening_or_risk:
+    - breast cancer screening
+    - breast cancer prevention
+    - breast cancer development
+    - cancer incidence of alternate-day
+    - hereditary breast/ovarian cancer syndrome
+    - brca1/2
+    - brca 1 or brca 2
+  hematology_or_paraneoplastic:
+    - hematologic malignancies
+    - bone marrow transplant patients
+    - myeloma associated
+    - myeloma-associated
+    - paraneoplastic syndromes
+    - lambert-eaton myasthenic syndrome
+    - ectopic acth
+    - oncologic problems
+    - suspected skin cancer
+    - skin cancer surgery
+    - colorectal cancer lesions
+    - colorectal cancer lesion
+    - renal cancer diagnosis
+
+low_text_abbreviation_artifact_patterns:
+  crc:
+    - clinical research center
+    - through the crc
+    - to a crc
+    - admitted to a clinical research center
+    - coordinate the study through the crc
+    - crc to allow for frequent blood sampling
+  hcc:
+    - hcc intervention
+    - hcc program
+    - home-based continuing care
+  cml:
+    - columbus metropolitan library
+
+low_text_non_oncology_meaning_patterns:
+  malignant_non_cancer_usage:
+    - malignant arrhythmias
+    - malignant ventricular arrhythmias
+    - malignant hypertension
+    - malignant hyperthermia
+  biology_terms:
+    - tumor necrosis factor
+    - tumour necrosis factor
+    - tumor necrosis factor-alpha
+    - tumour necrosis factor-alpha
+    - leukemia inhibitory factor
+    - leukaemia inhibitory factor
+
+low_text_drug_prior_oncology_use_patterns:
+  approval_or_label_history:
+    - approved for treating some cancers
+    - approved for treating women with breast and other cancers
+    - approved for the treatment of some cancers
+    - fda has approved il-2 for the treatment of some cancers
+    - hydroxyurea is approved for treating some cancers
+    - taxol is approved by the food and drug administration for use in cancer
+    - used to treat some types of cancer
+    - fda-approved to treat nausea and vomiting caused by cancer therapy
+    - fda approved to treat nausea and vomiting caused by cancer therapy
+  prior_trial_history:
+    - approved rituximab in 1997 for the treatment of b-cell non-hodgkin
+    - used in clinical trials for multiple myeloma
+    - used in clinical trials for multiple myeloma, non-hodgkin's lymphoma and leukemia
+
+low_text_benign_or_nonmalignant_patterns:
+  benign_tumors_or_overgrowth:
+    - benign uterine fibroid
+    - benign uterine fibroid tumors
+    - benign tumor
+    - benign tumors
+    - benign prostatic hyperplasia
+    - prostatic hyperplasia
+    - uterine leiomyoma
+    - leiomyoma
+    - dermoid ovarian cysts
+    - osteoid osteoma
+    - adrenal incidentalomas
+  vascular_or_lymphatic_malformations:
+    - lymphangioma
+    - lymphatic malformations
+    - macrocystic lymphatic malformations
+    - angiomyolipomas
+    - hypervascular tumors
+  benign_neurocutaneous:
+    - plexiform neurofibroma
+    - plexiform neurofibromas
+    - benign dermal neurofibromas
+    - vestibular schwannoma
+    - acoustic neuroma
+  other_nonmalignant:
+    - lymphangioleiomyomatosis
+    - tumoral calcinosis
+    - fibroid tumors
+
+low_text_infection_background_patterns:
+  viral_or_hiv_background:
+    - kaposi's sarcoma virus
+    - kaposi s sarcoma virus
+    - kaposi sarcoma virus
+    - aids-associated malignancies
+    - aids-associated malignancy
+    - aids related malignancies
+    - aids-related malignancies
+    - hhv-8
+    - human t cell leukemia virus
+    - htlv stands for human t cell leukemia virus
+  hepatitis_liver_cancer_background:
+    - hepatocellular carcinoma had been reported
+    - may be associated with chronic hepatitis, cirrhosis, hepatocellular carcinoma
+    - prevent liver cancer and reduce the need for liver transplantation
+    - negative for hcc
+
+low_text_epidemiology_background_patterns:
+  cohort_or_public_health:
+    - epidemiology of cardiovascular
+    - cardiovascular and non-cardiovascular risk
+    - mortality surveillance
+    - risk factor survey
+    - health professionals follow-up study
+    - nurses' health study
+    - lipid research clinics
+    - mrfit
+    - multiple risk factor intervention trial
+    - cohort study of cardiac risk
+    - whitehall ii
+    - endogenous estrogen and coronary heart disease
+    - patterns of fatty acids in framingham offspring
+    - low cholesterol and mortality
+    - venous thromboembolism
+    - chronic diseases -- cardiovascular diseases, diabetes, and cancers
