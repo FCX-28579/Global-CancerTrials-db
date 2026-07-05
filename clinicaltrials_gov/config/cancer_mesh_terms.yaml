@@ -1,0 +1,178 @@
+﻿# Cancer-related MeSH handling rules for ClinicalTrials.gov browse_conditions.
+#
+# These terms are exact or normalized MeSH labels observed in AACT/ClinicalTrials.gov
+# browse_conditions or standard oncology MeSH terminology. They are split by how
+# safe they are as standalone evidence that a trial belongs in an oncology trial
+# database.
+#
+# Operational rule:
+# - malignant_or_cancer_specific: keep as high-confidence oncology.
+# - precancer_or_prevention: keep as cancer prevention / precancer-related.
+# - broad_or_ambiguous_review: keep pending for LLM/manual review.
+# - benign_or_non_oncology_exclude: reject when no stronger malignant/precancer
+#   MeSH term is present for the same trial.
+
+version: 0.1
+
+malignant_or_cancer_specific:
+  # Core malignant neoplasm language
+  - Adenocarcinoma
+  - Carcinoma
+  - Carcinoma, Ductal, Breast
+  - Carcinoma, Hepatocellular
+  - Carcinoma, Non-Small-Cell Lung
+  - Carcinoma, Renal Cell
+  - Carcinoma, Small Cell
+  - Carcinoma, Squamous Cell
+  - Cholangiocarcinoma
+  - Malignant
+  - Malignant Neoplasms
+  - Neoplasm Metastasis
+  - Neoplasm Recurrence, Local
+  - Neoplastic Cells, Circulating
+
+  # Hematologic malignancies
+  - Acute Myeloid Leukemia
+  - Bone Marrow Neoplasms
+  - Chronic Myeloid Leukemia
+  - Hodgkin Disease
+  - Leukemia
+  - Leukemia, Lymphoid
+  - Leukemia, Myeloid
+  - Lymphoma
+  - Lymphoma, B-Cell
+  - Lymphoma, Follicular
+  - Lymphoma, Large B-Cell, Diffuse
+  - Lymphoma, Mantle-Cell
+  - Lymphoma, Non-Hodgkin
+  - Lymphoma, T-Cell
+  - Multiple Myeloma
+  - Myelodysplastic Syndromes
+  - Myelofibrosis
+  - Myeloproliferative Disorders
+  - Myeloproliferative Neoplasms
+  - Neoplasms, Plasma Cell
+  - Polycythemia Vera
+  - Precursor Cell Lymphoblastic Leukemia-Lymphoma
+  - Waldenstrom Macroglobulinemia
+
+  # Solid tumor histologies and common pediatric/rare cancers
+  - Astrocytoma
+  - Breast Cancer Lymphedema
+  - Colorectal Cancer, Hereditary Nonpolyposis
+  - Colorectal Cancer, Hereditary Nonpolyposis, Type 6
+  - Prostate Cancer, Hereditary, 11
+  - Rhabdoid Tumor Predisposition Syndrome 2
+  - Brain Neoplasms
+  - Ependymoma
+  - Germinoma
+  - Glioblastoma
+  - Glioma
+  - Head and Neck Neoplasms
+  - Kaposi Sarcoma
+  - Medulloblastoma
+  - Melanoma
+  - Mesothelioma
+  - Neuroblastoma
+  - Neuroendocrine Tumors
+  - Osteosarcoma
+  - Paraganglioma
+  - Pheochromocytoma
+  - Retinoblastoma
+  - Rhabdomyosarcoma
+  - Sarcoma
+  - Sarcoma, Ewing
+  - Soft Tissue Neoplasms
+
+  # Site-based cancer terms. Some MeSH site neoplasm headings can include benign
+  # entities; they are still treated as strong if the specific site/histology is
+  # assigned, but benign/noise terms below can override only when no strong term
+  # is present.
+  - Bile Duct Neoplasms
+  - Bladder Neoplasms
+  - Breast Neoplasms
+  - Colonic Neoplasms
+  - Colorectal Neoplasms
+  - Digestive System Neoplasms
+  - Endometrial Neoplasms
+  - Esophageal Neoplasms
+  - Gastrointestinal Neoplasms
+  - Kidney Neoplasms
+  - Liver Neoplasms
+  - Lung Neoplasms
+  - Mouth Neoplasms
+  - Ovarian Neoplasms
+  - Pancreatic Neoplasms
+  - Prostatic Neoplasms
+  - Rectal Neoplasms
+  - Skin Neoplasms
+  - Stomach Neoplasms
+  - Thyroid Neoplasms
+  - Urologic Neoplasms
+  - Uterine Cervical Neoplasms
+
+precancer_or_prevention:
+  - Actinic Keratosis
+  - Adenoma
+  - Adenomatous Polyps
+  - Barrett Esophagus
+  - Cervical Dysplasia
+  - Cervical Intraepithelial Neoplasia
+  - Colonic Polyps
+  - Leukoplakia
+  - Oral Leukoplakia
+  - Precancerous Conditions
+  - Prostatic Intraepithelial Neoplasia
+  - Squamous Intraepithelial Lesions
+  - Uterine Cervical Dysplasia
+
+broad_or_ambiguous_review:
+  - Endocrine Gland Neoplasms
+  - Neoplasm
+  - Neoplasms
+  - Neoplasms by Histologic Type
+  - Neoplasms by Site
+  - Neoplasms, Connective and Soft Tissue
+  - Neoplasms, Connective Tissue
+  - Neoplasms, Germ Cell and Embryonal
+  - Neoplasms, Glandular and Epithelial
+  - Neoplasms, Multiple Primary
+  - Neoplasms, Nerve Tissue
+  - Neoplasms, Neuroepithelial
+  - Neoplasms, Vascular Tissue
+  - Neoplastic Processes
+  - Neoplastic Syndromes, Hereditary
+  - Nervous System Neoplasms
+  - Paraneoplastic Syndromes
+  - Paraneoplastic Syndromes, Nervous System
+  - Tumor
+  - Tumor Virus Infections
+
+benign_or_non_oncology_exclude:
+  # Benign neoplasms or non-malignant anatomic/pathologic terms that often sit
+  # under the MeSH Neoplasms tree.
+  - Acanthosis Nigricans
+  - Adenomyosis
+  - Cysts
+  - Dupuytren Contracture
+  - Epidermal Cyst
+  - Fibroma
+  - Fibroids
+  - Hamartoma
+  - Keratosis
+  - Leiomyoma
+  - Lymphangiomyoma
+  - Lymphatic Malformations
+  - Malignant Atrophic Papulosis
+  - Malignant Fever
+  - Myeloproliferative Syndrome, Transient
+  - Morton's Neuroma
+  - Neuroma
+  - Ovarian Cysts
+  - Papillomavirus Infections
+  - Polycystic Ovary Syndrome
+  - Tuberous Sclerosis
+  - Uterine Fibroids
+  - Warts
+
+
