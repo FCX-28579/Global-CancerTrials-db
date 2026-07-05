@@ -1,56 +1,110 @@
 ﻿---
-name: global-cancer-trials-db-orchestrator
-description: Coordinate source-specific cancer trial database builders and merge reviewed source-local outputs into a unified registry database for clinical trial matching.
+name: clinicaltrials-gov-cancer-source-builder
+description: Build or refresh the ClinicalTrials.gov oncology trial source-local database from AACT or the ClinicalTrials.gov API, including recall, preprocessing, LLM/manual review import, registry loading, and quality checks.
 license: MIT
 metadata:
   author: CancerDAO
   version: "0.5.0"
-  parent_skill: clinical-trial-matching
+  parent_skill: global-cancer-trials-db-orchestrator
 ---
 
-# Global Cancer Trials DB Orchestrator
+# ClinicalTrials.gov Cancer Source Builder
 
-This parent skill coordinates multiple source-specific builders. It does not own registry-specific crawling, recall rules, or source-specific LLM review prompts.
+This child skill owns the full ClinicalTrials.gov / AACT source workflow.
 
-## Source Skills
+## Scope
 
-- `sources/clinicaltrials_gov/SKILL.md`: ClinicalTrials.gov / AACT source builder.
-- `sources/china_chictr/SKILL.md`: ChiCTR source builder design and implementation area.
+Source folder:
 
-## Parent Responsibilities
+```text
+sources/clinicaltrials_gov/
+```
 
-- Keep the shared registry schema in `schemas/registry_schema.sql`.
-- Define source boundaries and expected normalized output contracts.
-- Run source builders through their child skills.
-- Merge reviewed source-local databases into a final multi-source database.
-- Detect duplicate registry records across sources when that integration layer is implemented.
-- Produce source-comparison and final integrated quality reports.
+Default source-local database:
 
-## Child Source Responsibilities
+```text
+sources/clinicaltrials_gov/data/ctgov_cancer_trials.db
+```
 
-Each child source owns:
+AACT archive used for the current build:
 
-- Source acquisition or source import.
-- Source-specific recall terms and preprocessing rules.
-- Source-specific LLM/manual review batching.
-- Source-local SQLite output.
-- Source-local quality reports.
+```text
+sources/clinicaltrials_gov/data/aact_export_2026-07-03.zip
+```
 
-## Shared Output Contract
+## Responsibilities
 
-Every source builder should produce the six registry tables defined by `schemas/registry_schema.sql`:
+Python handles deterministic work:
 
-- `raw_trial_records`
-- `trial_master`
-- `trial_registry_ids`
-- `trial_interventions`
-- `trial_eligibility_criteria`
-- `trial_sites`
+- Read AACT flat files from zip or extracted directory.
+- Initialize the shared registry schema.
+- Apply high-recall oncology candidate scanning.
+- Apply ClinicalTrials.gov-specific MeSH and false-positive preprocessing.
+- Export compact current-conversation review batches.
+- Import reviewed LLM/manual decisions.
+- Load reviewed-only records into the six registry tables.
+- Validate counts, completeness, and recall quality.
 
-The parent skill treats source-local databases as inputs. It should not reinterpret source-specific raw pages unless a child source explicitly exposes that data.
+LLM/manual review is used only after deterministic preprocessing for uncertain medium/low candidates.
 
-## Boundary Rule
+## Source-Specific Config
 
-ClinicalTrials.gov-specific files belong under `sources/clinicaltrials_gov/`.
-ChiCTR-specific files belong under `sources/china_chictr/`.
-The root project keeps only shared schema, parent documentation, dependencies, and future integration code.
+```text
+config/cancer_recall_terms.yaml
+config/cancer_mesh_terms.yaml
+config/pre_llm_false_positive_rules.yaml
+```
+
+These files are ClinicalTrials.gov / AACT specific and should not be treated as the global source-agnostic vocabulary.
+
+## Main Commands
+
+Schema smoke test:
+
+```bash
+python sources/clinicaltrials_gov/scripts/test_build_ctgov_cancer_db.py
+```
+
+Build from AACT zip:
+
+```bash
+python sources/clinicaltrials_gov/scripts/build_aact_source_db.py \
+  --aact-zip sources/clinicaltrials_gov/data/aact_export_2026-07-03.zip \
+  --out sources/clinicaltrials_gov/data/ctgov_cancer_trials.db \
+  --batch-size 50000 \
+  --low-confidence-policy reviewed-only
+```
+
+Monitor build state:
+
+```bash
+python sources/clinicaltrials_gov/scripts/monitor_aact_build.py \
+  --db sources/clinicaltrials_gov/data/ctgov_cancer_trials.db
+```
+
+Export current-conversation review batch:
+
+```bash
+python sources/clinicaltrials_gov/scripts/export_conversation_review_batch.py \
+  --db sources/clinicaltrials_gov/data/ctgov_cancer_trials.db \
+  --aact-zip sources/clinicaltrials_gov/data/aact_export_2026-07-03.zip \
+  --tier all \
+  --limit 100 \
+  --batch-id BATCH_ID
+```
+
+Import review results:
+
+```bash
+python sources/clinicaltrials_gov/scripts/import_conversation_review_results.py \
+  --db sources/clinicaltrials_gov/data/ctgov_cancer_trials.db \
+  --results sources/clinicaltrials_gov/data/quality_reports/conversation_review_all_pending_20260704.results.jsonl
+```
+
+## Quality Reports
+
+ClinicalTrials.gov quality reports live under:
+
+```text
+sources/clinicaltrials_gov/data/quality_reports/
+```
